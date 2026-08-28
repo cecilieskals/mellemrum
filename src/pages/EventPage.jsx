@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
+import {create} from "../services/registrations";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const headers = {
@@ -12,6 +13,7 @@ export default function EventPage() {
   const [event, setEvent] = useState(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function getEvent() {
@@ -25,7 +27,24 @@ export default function EventPage() {
 
   async function handleSubmit(eventSubmit) {
     eventSubmit.preventDefault();
-    console.log({ name, email, event: event.title });
+    setIsSubmitting(true);
+
+    try {
+      await create({
+        name: name.trim(),
+        email: email.trim(),
+        eventTitle: event.title,
+        eventDate: event.date,
+        eventLocation: event.venueName,
+      });
+
+      setName("");
+      setEmail("");
+    } catch (error) {
+      console.error("Error creating registration:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (!event) {
