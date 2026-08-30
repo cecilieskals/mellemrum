@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
+import {create} from "../services/registrations";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const headers = {
@@ -12,6 +13,8 @@ export default function EventPage() {
   const [event, setEvent] = useState(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
 
   useEffect(() => {
     async function getEvent() {
@@ -25,7 +28,27 @@ export default function EventPage() {
 
   async function handleSubmit(eventSubmit) {
     eventSubmit.preventDefault();
-    console.log({ name, email, event: event.title });
+    setIsSubmitting(true);
+    setSubmitMessage("");
+
+    try {
+      await create({
+        name: name.trim(),
+        email: email.trim(),
+        eventTitle: event.title,
+        eventDate: event.date,
+        eventLocation: event.venueName,
+      });
+
+      setName("");
+      setEmail("");
+      setSubmitMessage("Tak for din tilmelding! Vi har sendt en bekræftelse til din e-mail.");
+    } catch (error) {
+      console.error("Error creating registration:", error);
+      setSubmitMessage("Der opstod en fejl under tilmeldingen. Prøv igen.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (!event) {
@@ -86,15 +109,24 @@ export default function EventPage() {
           <form onSubmit={handleSubmit}>
             <label>
               Navn
-              <input value={name} onChange={(inputEvent) => setName(inputEvent.target.value)} />
+              <input 
+              required 
+              value={name} 
+              onChange={(inputEvent) => setName(inputEvent.target.value)} />
             </label>
             <span>E-mail</span>
             <input
+              required
+              type="email"
               value={email}
               onChange={(inputEvent) => setEmail(inputEvent.target.value)}
               placeholder="dig@example.com"
             />
-            <button type="submit">Tilmeld mig</button>
+            <button 
+            type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Gemmer..." : "Tilmeld"}
+            </button>
+            {submitMessage && <span role="status">{submitMessage}</span>}
           </form>
         </section>
       </main>
