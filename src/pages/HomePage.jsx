@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import EventCard from "../components/EventCard";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const headers = {
@@ -87,19 +88,7 @@ export default function HomePage() {
 
         <section className="event-grid">
           {filteredEvents.map((event) => (
-            <Link className="event-card" key={event.id} to={`/events/${event.id}`}>
-              <img src={event.image} alt="" />
-              <div className="event-card-content">
-                <p className="event-category">{event.category}</p>
-                <h3>{event.title}</h3>
-                <p>{event.summary}</p>
-                <div className="event-meta">
-                  <span>{formatEventDate(event.date)}</span>
-                  <span>{event.venueName}</span>
-                </div>
-                <span className="card-link">Læs mere</span>
-              </div>
-            </Link>
+              <EventCard key={event.id} event={event} />
           ))}
         </section>
       </main>
