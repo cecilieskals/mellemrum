@@ -14,6 +14,7 @@ export default function EventPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
 
   useEffect(() => {
     async function getEvent() {
@@ -28,6 +29,7 @@ export default function EventPage() {
   async function handleSubmit(eventSubmit) {
     eventSubmit.preventDefault();
     setIsSubmitting(true);
+    setSubmitMessage("");
 
     try {
       await create({
@@ -40,8 +42,10 @@ export default function EventPage() {
 
       setName("");
       setEmail("");
+      setSubmitMessage("Tak for din tilmelding! Vi har sendt en bekræftelse til din e-mail.");
     } catch (error) {
       console.error("Error creating registration:", error);
+      setSubmitMessage("Der opstod en fejl under tilmeldingen. Prøv igen.");
     } finally {
       setIsSubmitting(false);
     }
@@ -105,15 +109,24 @@ export default function EventPage() {
           <form onSubmit={handleSubmit}>
             <label>
               Navn
-              <input value={name} onChange={(inputEvent) => setName(inputEvent.target.value)} />
+              <input 
+              required 
+              value={name} 
+              onChange={(inputEvent) => setName(inputEvent.target.value)} />
             </label>
             <span>E-mail</span>
             <input
+              required
+              type="email"
               value={email}
               onChange={(inputEvent) => setEmail(inputEvent.target.value)}
               placeholder="dig@example.com"
             />
-            <button type="submit">Tilmeld mig</button>
+            <button 
+            type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Gemmer..." : "Tilmeld"}
+            </button>
+            {submitMessage && <span role="status">{submitMessage}</span>}
           </form>
         </section>
       </main>
