@@ -28,5 +28,5 @@ export default function Footer() {
             <p>Aarhus, Danmark</p>
         </div>
     </footer>
-    )
+    );
 }
