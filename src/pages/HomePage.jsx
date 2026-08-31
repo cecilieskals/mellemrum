@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import EventCard from "../components/EventCard";
 import Footer from "../components/Footer";
+import { SkeletonEventCard } from "../components/Skeleton";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const headers = {
@@ -13,12 +14,26 @@ export default function HomePage() {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Alle");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function getEvents() {
-      const response = await fetch(`${SUPABASE_URL}/events?order=date.asc`, { headers });
-      const data = await response.json();
-      setEvents(data);
+      setIsLoading(true);
+      setError(null);
+
+      try{
+        const response = await fetch(`${SUPABASE_URL}/events?order=date.asc`, { headers });
+        if (!response.ok) { throw new Error("Kunne ikke indlæse events."); }
+
+        const data = await response.json();
+        setEvents(data);
+
+      } catch (error) {
+        setError("Der opstod en fejl. Prøv at genindlæse siden.");
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     getEvents();
@@ -51,7 +66,8 @@ export default function HomePage() {
         <p className="eyebrow">Kultur i Aarhus</p>
         <h1>Find plads til noget nyt.</h1>
         <p className="hero-copy">
-          Koncerter, talks og workshops samlet ét sted. Find dit næste event, og tilmeld dig på få minutter.
+          Koncerter, talks og workshops samlet ét sted. Find dit næste event, og
+          tilmeld dig på få minutter.
         </p>
         <a className="hero-link" href="#events">
           Se kommende events ↓
@@ -79,7 +95,10 @@ export default function HomePage() {
           </label>
           <label>
             Kategori
-            <select value={category} onChange={(event) => setCategory(event.target.value)}>
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+            >
               {categories.map((item) => (
                 <option key={item}>{item}</option>
               ))}
@@ -87,10 +106,30 @@ export default function HomePage() {
           </label>
         </section>
 
-        <section className="event-grid">
-          {filteredEvents.map((event) => (
+        <section className="event-grid" aria-busy={isLoading}>
+          {isLoading && (
+            <>
+              <p role="status" className="sr-only">
+                Indlæser events…
+              </p>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <SkeletonEventCard key={index} />
+              ))}
+            </>
+          )}
+          {!isLoading && error && (
+            <p className="message" role="alert">
+              {error}
+            </p>
+          )}
+          {!isLoading && !error && filteredEvents.length === 0 && (
+            <p className="message">Ingen events matcher din søgning.</p>
+          )}
+          {!isLoading &&
+            !error &&
+            filteredEvents.map((event) => (
               <EventCard key={event.id} event={event} />
-          ))}
+            ))}
         </section>
       </main>
       <Footer />
