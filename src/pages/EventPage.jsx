@@ -26,7 +26,9 @@ export default function EventPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${SUPABASE_URL}/events?id=eq.${eventId}`, { headers });
+        const query = "select=*,venue:venues(*)";
+        const response = await fetch(`${SUPABASE_URL}/events?id=eq.${eventId}&${query}`, { headers });
+
         if (!response.ok) {throw new Error("Kunne ikke indlæse event.");}
         const data = await response.json();
         setEvent(data[0] ?? null);
@@ -50,9 +52,7 @@ export default function EventPage() {
       await create({
         name: name.trim(),
         email: email.trim(),
-        eventTitle: event.title,
-        eventDate: event.date,
-        eventLocation: event.venueName,
+        eventId: event.id
       });
 
       setName("");
@@ -130,13 +130,13 @@ export default function EventPage() {
               <p>
                 <strong>Sted</strong>
                 <span>
-                  {event.venueName}
+                  {event.venue.name}
                   <br />
                   {event.venueAddress}, {event.venuePostalCode} {event.venueCity}
-                  {event.venueWebsite && (
+                  {event.venue.website && (
                     <>
                       <br />
-                      <a href={event.venueWebsite}>Besøg venue</a>
+                      <a href={event.venue.website}>Besøg venue</a>
                     </>
                   )}
                 </span>
