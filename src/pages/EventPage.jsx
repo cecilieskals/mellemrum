@@ -113,31 +113,44 @@ export default function EventPage() {
             <p className={styles.eventCategory}>{event.category}</p>
             <h1>{event.title}</h1>
             <p className={styles.lead}>{event.summary}</p>
-            <div className={styles.detailList}>
-              <p>
-                <strong>Dato</strong>
-                {date.toLocaleDateString("da-DK", { weekday: "long", day: "numeric", month: "long" })} kl.{" "}
-                {date.toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" })}
-              </p>
-              <p>
-                <strong>Sted</strong>
-                <span>
+            <dl className={styles.detailList}>
+              <div>
+                <dt>Dato</dt>
+                <dd>
+                  {date.toLocaleDateString("da-DK", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                  })}{" "}
+                  kl.{" "}
+                  {date.toLocaleTimeString("da-DK", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </dd>
+              </div>
+
+              <div>
+                <dt>Sted</dt>
+                <dd>
                   {event.venue.name}
                   <br />
-                  {event.venueAddress}, {event.venuePostalCode} {event.venueCity}
+                  {event.venueAddress}, {event.venuePostalCode}{" "}
+                  {event.venueCity}
                   {event.venue.website && (
                     <>
                       <br />
                       <a href={event.venue.website}>Besøg venue</a>
                     </>
                   )}
-                </span>
-              </p>
-              <p>
-                <strong>Pris</strong>
-                {event.price === 0 ? "Gratis" : `${event.price} kr.`}
-              </p>
-            </div>
+                </dd>
+              </div>
+
+              <div>
+                <dt>Pris</dt>
+                <dd>{event.price === 0 ? "Gratis" : `${event.price} kr.`}</dd>
+              </div>
+            </dl>
             <p>{event.description}</p>
           </div>
         </section>
@@ -146,27 +159,31 @@ export default function EventPage() {
           <div>
             <p className={styles.eyebrowDark}>Tilmelding</p>
             <h2>Reserver din plads</h2>
-            <p>Udfyld formularen, så sender vi din tilmelding til arrangøren.</p>
+            <p>
+              Udfyld formularen, så sender vi din tilmelding til arrangøren.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit}>
             <label>
               Navn
-              <input 
-              required 
-              value={name} 
-              onChange={(inputEvent) => setName(inputEvent.target.value)} />
+              <input
+                required
+                value={name}
+                onChange={(inputEvent) => setName(inputEvent.target.value)}
+              />
             </label>
-            <span>E-mail</span>
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(inputEvent) => setEmail(inputEvent.target.value)}
-              placeholder="dig@example.com"
-            />
-            <button 
-            type="submit" disabled={isSubmitting}>
+            <label>
+              E-mail
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(inputEvent) => setEmail(inputEvent.target.value)}
+                placeholder="dig@example.com"
+              />
+            </label>
+            <button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Gemmer..." : "Tilmeld"}
             </button>
             {submitMessage && <span role="status">{submitMessage}</span>}

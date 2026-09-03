@@ -3,7 +3,7 @@ import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   return (
-    <nav className={styles.siteNav}>
+    <nav className={styles.siteNav} aria-label="Hovednavigation">
       <NavLink className={styles.brand} to="/">
         mellemrum<span>.</span>
       </NavLink>

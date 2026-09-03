@@ -46,7 +46,6 @@ export default function RegistrationsPage() {
         <p className={styles.eyebrow}>Internt overblik</p>
         <h1>Tilmeldinger</h1>
         <p> {isLoading ? "Indlæser…" : `${registrationCount} tilmeldinger i alt`} </p>
-        <p>{registrationCount} tilmeldinger i alt</p>
       </header>
       <main>
         <div className={styles.registrationList} aria-busy={isLoading}>
@@ -66,7 +65,7 @@ export default function RegistrationsPage() {
           )}
           {!isLoading && error && <p className={styles.message} role="alert">{error}</p>}
           {!isLoading && !error && registrations.length === 0 && (
-            <p className={styles.message} role="alert">
+            <p className={styles.message} role="status">
               Ingen tilmeldinger endnu.
             </p>
           )}

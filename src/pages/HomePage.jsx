@@ -77,6 +77,7 @@ export default function HomePage() {
         </section>
 
         <section className={styles.filters}>
+          <h2 className="sr-only">Filtrer events</h2>
           <label>
             Søg
             <input
@@ -116,8 +117,8 @@ export default function HomePage() {
             </p>
           )}
           {!isLoading && !error && filteredEvents.length === 0 && (
-            <p className={styles.message} role="alert">
-              Ingenting events matcher din søgning.
+            <p className={styles.message} role="status">
+              Ingen events matcher din søgning.
             </p>
           )}
           {!isLoading &&
