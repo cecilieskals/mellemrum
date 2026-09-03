@@ -4,12 +4,7 @@ import {create} from "../services/registrations";
 import Footer from "../components/Footer";
 import { SkeletonEventDetail } from "../components/Skeleton";
 import styles from "./EventPage.module.css";
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const headers = {
-  apikey: import.meta.env.VITE_SUPABASE_APIKEY,
-  "Content-Type": "application/json"
-}; 
+import { getEvent } from "../services/events.js";
 
 export default function EventPage() {
   const { eventId } = useParams();
@@ -22,16 +17,13 @@ export default function EventPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function getEvent() {
+    async function loadEvent() {
       setIsLoading(true);
       setError(null);
-      try {
-        const query = "select=*,venue:venues(*)";
-        const response = await fetch(`${SUPABASE_URL}/events?id=eq.${eventId}&${query}`, { headers });
 
-        if (!response.ok) {throw new Error("Kunne ikke indlæse event.");}
-        const data = await response.json();
-        setEvent(data[0] ?? null);
+      try {
+        const data = await getEvent(eventId);
+        setEvent(data);
       } catch (error) {
         console.error("Error fetching event:", error);
         setError("Der opstod en fejl. Prøv at genindlæse siden.");
@@ -40,7 +32,7 @@ export default function EventPage() {
       }
     }
 
-    getEvent();
+    loadEvent();
   }, [eventId]);
 
   async function handleSubmit(eventSubmit) {
@@ -121,31 +113,44 @@ export default function EventPage() {
             <p className={styles.eventCategory}>{event.category}</p>
             <h1>{event.title}</h1>
             <p className={styles.lead}>{event.summary}</p>
-            <div className={styles.detailList}>
-              <p>
-                <strong>Dato</strong>
-                {date.toLocaleDateString("da-DK", { weekday: "long", day: "numeric", month: "long" })} kl.{" "}
-                {date.toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" })}
-              </p>
-              <p>
-                <strong>Sted</strong>
-                <span>
+            <dl className={styles.detailList}>
+              <div>
+                <dt>Dato</dt>
+                <dd>
+                  {date.toLocaleDateString("da-DK", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                  })}{" "}
+                  kl.{" "}
+                  {date.toLocaleTimeString("da-DK", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </dd>
+              </div>
+
+              <div>
+                <dt>Sted</dt>
+                <dd>
                   {event.venue.name}
                   <br />
-                  {event.venueAddress}, {event.venuePostalCode} {event.venueCity}
+                  {event.venueAddress}, {event.venuePostalCode}{" "}
+                  {event.venueCity}
                   {event.venue.website && (
                     <>
                       <br />
                       <a href={event.venue.website}>Besøg venue</a>
                     </>
                   )}
-                </span>
-              </p>
-              <p>
-                <strong>Pris</strong>
-                {event.price === 0 ? "Gratis" : `${event.price} kr.`}
-              </p>
-            </div>
+                </dd>
+              </div>
+
+              <div>
+                <dt>Pris</dt>
+                <dd>{event.price === 0 ? "Gratis" : `${event.price} kr.`}</dd>
+              </div>
+            </dl>
             <p>{event.description}</p>
           </div>
         </section>
@@ -154,27 +159,31 @@ export default function EventPage() {
           <div>
             <p className={styles.eyebrowDark}>Tilmelding</p>
             <h2>Reserver din plads</h2>
-            <p>Udfyld formularen, så sender vi din tilmelding til arrangøren.</p>
+            <p>
+              Udfyld formularen, så sender vi din tilmelding til arrangøren.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit}>
             <label>
               Navn
-              <input 
-              required 
-              value={name} 
-              onChange={(inputEvent) => setName(inputEvent.target.value)} />
+              <input
+                required
+                value={name}
+                onChange={(inputEvent) => setName(inputEvent.target.value)}
+              />
             </label>
-            <span>E-mail</span>
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(inputEvent) => setEmail(inputEvent.target.value)}
-              placeholder="dig@example.com"
-            />
-            <button 
-            type="submit" disabled={isSubmitting}>
+            <label>
+              E-mail
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(inputEvent) => setEmail(inputEvent.target.value)}
+                placeholder="dig@example.com"
+              />
+            </label>
+            <button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Gemmer..." : "Tilmeld"}
             </button>
             {submitMessage && <span role="status">{submitMessage}</span>}

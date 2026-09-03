@@ -6,22 +6,22 @@ export default function Footer() {
     <footer className={styles.siteFooter}>
         <div className={styles.footerTop}>
             <div className={styles.footerIntro}>
-            <p className={styles.footerBrand}>
-                mellemrum<span>.</span>
-            </p>
-            <p>Udvalgte kulturoplevelser og nye perspektiver på Aarhus.</p>
+                <p className={styles.footerBrand}>
+                    mellemrum<span>.</span>
+                </p>
+                <p>Udvalgte kulturoplevelser og nye perspektiver på Aarhus.</p>
             </div>
             <nav className={styles.footerLinks} aria-label="Footer">
-            <div className={styles.footerLinkGroup}>
-                <p className={styles.footerHeading}>Udforsk</p>
-                <Link to="/">Events</Link>
-                <Link to="/om">Om Mellemrum</Link>
-            </div>
-            <div className={styles.footerLinkGroup}>
-                <p className={styles.footerHeading}>For arrangører</p>
-                <Link to="/tilmeldinger">Se tilmeldinger</Link>
-                <a href="mailto:hej@mellemrum.dk">Kontakt os</a>
-            </div>
+                <div className={styles.footerLinkGroup}>
+                    <h2 className={styles.footerHeading}>Udforsk</h2>
+                    <Link to="/">Events</Link>
+                    <Link to="/om">Om Mellemrum</Link>
+                </div>
+                <div className={styles.footerLinkGroup}>
+                    <h2 className={styles.footerHeading}>For arrangører</h2>
+                    <Link to="/tilmeldinger">Se tilmeldinger</Link>
+                    <a href="mailto:hej@mellemrum.dk">Kontakt os</a>
+                </div>
             </nav>
         </div>
         <div className={styles.footerBottom}>
