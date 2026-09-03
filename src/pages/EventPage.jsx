@@ -4,12 +4,7 @@ import {create} from "../services/registrations";
 import Footer from "../components/Footer";
 import { SkeletonEventDetail } from "../components/Skeleton";
 import styles from "./EventPage.module.css";
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const headers = {
-  apikey: import.meta.env.VITE_SUPABASE_APIKEY,
-  "Content-Type": "application/json"
-}; 
+import { getEvent } from "../services/events.js";
 
 export default function EventPage() {
   const { eventId } = useParams();
@@ -22,16 +17,13 @@ export default function EventPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function getEvent() {
+    async function loadEvent() {
       setIsLoading(true);
       setError(null);
-      try {
-        const query = "select=*,venue:venues(*)";
-        const response = await fetch(`${SUPABASE_URL}/events?id=eq.${eventId}&${query}`, { headers });
 
-        if (!response.ok) {throw new Error("Kunne ikke indlæse event.");}
-        const data = await response.json();
-        setEvent(data[0] ?? null);
+      try {
+        const data = await getEvent(eventId);
+        setEvent(data);
       } catch (error) {
         console.error("Error fetching event:", error);
         setError("Der opstod en fejl. Prøv at genindlæse siden.");
@@ -40,7 +32,7 @@ export default function EventPage() {
       }
     }
 
-    getEvent();
+    loadEvent();
   }, [eventId]);
 
   async function handleSubmit(eventSubmit) {

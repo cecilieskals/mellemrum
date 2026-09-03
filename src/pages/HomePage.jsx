@@ -4,12 +4,7 @@ import EventCard from "../components/EventCard";
 import Footer from "../components/Footer";
 import { SkeletonEventCard } from "../components/Skeleton";
 import styles from "./HomePage.module.css";
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const headers = {
-  apikey: import.meta.env.VITE_SUPABASE_APIKEY,
-  "Content-Type": "application/json"
-};
+import { getEvents } from "../services/events.js";
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);
@@ -19,17 +14,12 @@ export default function HomePage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function getEvents() {
+    async function loadEvents() {
       setIsLoading(true);
       setError(null);
 
       try{
-        const query = "select=*,venue:venues(*)";
-        const response = await fetch(`${SUPABASE_URL}/events?${query}&order=date.asc`, { headers });
-        
-        if (!response.ok) { throw new Error("Kunne ikke indlæse events."); }
-
-        const data = await response.json();
+        const data = await getEvents();
         setEvents(data);
 
       } catch (error) {
@@ -39,7 +29,7 @@ export default function HomePage() {
       }
     }
 
-    getEvents();
+    loadEvents();
   }, []);
 
   const categories = ["Alle", ...new Set(events.map((event) => event.category))];
