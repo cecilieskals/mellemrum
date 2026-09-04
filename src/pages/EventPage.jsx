@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 import {create} from "../services/registrations";
 import Footer from "../components/Footer";
 import { SkeletonEventDetail } from "../components/Skeleton";
@@ -58,19 +58,6 @@ export default function EventPage() {
     }
   }
 
-  if (!event) {
-    return (
-      <main className={styles.eventPage}>
-        <Link className={styles.backLink} to="/">
-          ← Alle events
-        </Link>
-        <p className={styles.message} role="status">
-          Vi kunne ikke finde det event, du leder efter.
-        </p>
-      </main>
-    );
-  }
-
    if (isLoading) {
      return (
        <main className={styles.eventPage} aria-busy="true">
@@ -86,16 +73,11 @@ export default function EventPage() {
    }
 
    if (error) {
-     return (
-       <main className={styles.eventPage}>
-         <Link className={styles.backLink} to="/">
-           ← Alle events
-         </Link>
-         <p className={styles.message} role="alert">
-           {error}
-         </p>
-       </main>
-     );
+     return <Navigate to="/404" replace />;
+   }
+
+   if (!event) {
+     return <Navigate to="/404" replace />;
    }
 
   const date = new Date(event.date);
